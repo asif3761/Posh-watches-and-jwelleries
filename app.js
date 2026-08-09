@@ -60,7 +60,7 @@
       <article class="p-card reveal" data-route="/product/${p.id}" tabindex="0">
         <div class="icon">${window.NOIR_ICONS[p.icon]}</div>
         <h3>${p.name}</h3>
-        <span class="tag">Pre-Order</span>
+        <span class="tag">By Commission</span>
         <p class="p-tagline">${p.tagline}</p>
         <div class="p-card-foot">
           <span class="price">${fmt(p.price)}</span>
@@ -69,13 +69,28 @@
       </article>`;
   }
 
+  function marqueeHTML(){
+    const words = ["Hand-Finished", "Sealed in Wax", "By Appointment", "Cast in Antique Gold", "Bound by the Order"];
+    const line = words.map(w => `<span>${w}</span>`).join("");
+    return `
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track">${line}${line}</div>
+      </div>`;
+  }
+
   /* ---------------------------------------------------------
      VIEWS
   --------------------------------------------------------- */
   function viewHome(){
     return `
       <section class="hero">
+        <div class="hero-spotlight" id="hero-spotlight"></div>
         <div class="hero-mark" id="hero-mark">
+          <div class="shield-frame">
+            <svg viewBox="0 0 400 460" preserveAspectRatio="xMidYMid meet">
+              <path d="M200 12 L360 58 V220 C360 330 290 400 200 448 C110 400 40 330 40 220 V58 Z"/>
+            </svg>
+          </div>
           <svg viewBox="0 0 400 400" class="bezel-svg" aria-hidden="true">
             <circle class="bezel-outer" cx="200" cy="200" r="164"/>
             <circle class="bezel-inner" cx="200" cy="200" r="130"/>
@@ -86,14 +101,16 @@
             </g>
           </svg>
         </div>
-        <p class="eyebrow">Est. for those who keep their own hours</p>
+        <p class="eyebrow">Bound by the Order &middot; Est. for those who keep their own hours</p>
         <h1 class="hero-title">Noir <span class="amp">&amp;</span> Aurum</h1>
-        <p class="hero-sub">Timepieces struck in shadow. Fragrances distilled from gold.</p>
+        <p class="hero-sub">Timepieces struck in shadow. Fragrances distilled from gold. Objects made for those who move through the world quietly, and are recognised anyway.</p>
         <a href="#/timepieces" class="scroll-cue" data-route="/timepieces">
           <span>Enter the Atelier</span>
           <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 4v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
         </a>
       </section>
+
+      ${marqueeHTML()}
 
       <section class="collection">
         <div class="section-head reveal">
@@ -115,8 +132,68 @@
         <div class="card-grid">
           ${window.NOIR_PRODUCTS.filter(p => p.collection === "fragrances").slice(0,3).map(cardHTML).join("")}
         </div>
+      </section>
+
+      <section class="collection">
+        <div class="section-head reveal">
+          <span class="hour-mark">IX</span>
+          <h2>Codes of the Order</h2>
+          <p class="section-note">Three principles the house is built on, unchanged since the first piece left the atelier.</p>
+        </div>
+        <div class="pillars">
+          <div class="pillar reveal">
+            <div class="pillar-inner">
+              <span class="pillar-num">I</span>
+              <div class="pillar-icon">${shieldIcon()}</div>
+              <h3>Honour</h3>
+              <p>Every piece is exactly what it claims to be. No plating sold as solid gold, no quartz sold as automatic.</p>
+            </div>
+          </div>
+          <div class="pillar reveal">
+            <div class="pillar-inner">
+              <span class="pillar-num">II</span>
+              <div class="pillar-icon">${craftIcon()}</div>
+              <h3>Craft</h3>
+              <p>Small runs, hand-finished. We would rather make fifty pieces well than five hundred adequately.</p>
+            </div>
+          </div>
+          <div class="pillar reveal">
+            <div class="pillar-inner">
+              <span class="pillar-num">III</span>
+              <div class="pillar-icon">${sealIcon()}</div>
+              <h3>Discretion</h3>
+              <p>No logos shouting from across the room. What you wear should speak only to those close enough to notice.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="collection alt">
+        <div class="section-head reveal">
+          <span class="hour-mark">XII</span>
+          <h2>Correspondence</h2>
+          <p class="section-note">From those who have already joined the order.</p>
+        </div>
+        <div class="testimonials">
+          <div class="testimonial reveal">
+            <p>The Meridian is the first watch I've worn that people ask about without me ever bringing it up.</p>
+            <cite>Collector, Dhaka</cite>
+          </div>
+          <div class="testimonial reveal">
+            <p>Fumée Noire doesn't behave like anything else in my collection. It arrives quietly and stays for hours.</p>
+            <cite>Early Correspondent</cite>
+          </div>
+          <div class="testimonial reveal">
+            <p>Ordering directly and hearing back the same day, from an actual person, is rarer than it should be.</p>
+            <cite>First Commission</cite>
+          </div>
+        </div>
       </section>`;
   }
+
+  function shieldIcon(){ return `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M24 4 42 10v14c0 12-8 18-18 20-10-2-18-8-18-20V10Z"/><path d="M24 14v20M16 22h16"/></svg>`; }
+  function craftIcon(){ return `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="24" cy="24" r="9"/><path d="M24 4v6M24 38v6M4 24h6M38 24h6M9.5 9.5l4.3 4.3M34.2 34.2l4.3 4.3M9.5 38.5l4.3-4.3M34.2 13.8l4.3-4.3"/></svg>`; }
+  function sealIcon(){ return `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="24" cy="20" r="12"/><path d="M17 30 14 44l10-5 10 5-3-14"/></svg>`; }
 
   function viewCollection(key, title, note, hourMark){
     const items = window.NOIR_PRODUCTS.filter(p => p.collection === key);
@@ -300,12 +377,53 @@
         </div>
         <div class="atelier-body">
           <p class="reveal">Noir &amp; Aurum was founded on a simple pairing: the precision of a watch movement, and the warmth of a fragrance note. Every object we make sits at that intersection &mdash; engineered like a mechanism, worn like a scent.</p>
-          <p class="reveal">We are a small house. Pieces are produced in limited runs, and each release is announced first to those who follow us directly.</p>
+          <p class="reveal">We are a small house. Pieces are produced in limited runs, and each release is announced first to those who follow us directly &mdash; before they ever reach a shelf.</p>
+          <p class="reveal">Nothing leaves the atelier unfinished. A case is not simply cast; it is corrected by hand until the light sits on it the way it should. A fragrance is not simply blended; it is worn, revisited, and worn again before it is allowed a name.</p>
+        </div>
+      </section>
+
+      <section class="collection subsection">
+        <div class="section-head reveal">
+          <span class="hour-mark">VI</span>
+          <h2>Heritage</h2>
+          <p class="section-note">The path from a single workbench to a house.</p>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item reveal">
+            <span class="timeline-dot"></span>
+            <h4>Founding</h4>
+            <h3>A workbench, not a workshop</h3>
+            <p>The house began with a single case-maker's bench and a conviction that dark, restrained design had been left out of modern luxury for too long.</p>
+          </div>
+          <div class="timeline-item reveal">
+            <span class="timeline-dot"></span>
+            <h4>First Commission</h4>
+            <h3>The Meridian takes shape</h3>
+            <p>Our first timepiece was designed around a single idea: blackened steel should feel warmer, not colder, when gold is set against it.</p>
+          </div>
+          <div class="timeline-item reveal">
+            <span class="timeline-dot"></span>
+            <h4>The Blending Room</h4>
+            <h3>Fragrance joins the house</h3>
+            <p>What began as a personal blend for the founder became Fumée Noire &mdash; the first scent released under the Noir &amp; Aurum name.</p>
+          </div>
+          <div class="timeline-item reveal">
+            <span class="timeline-dot"></span>
+            <h4>Today</h4>
+            <h3>By appointment, by hand</h3>
+            <p>Every order is still confirmed personally. No call centre, no automated fulfilment &mdash; just the atelier, and the person who asked for it.</p>
+          </div>
         </div>
       </section>`;
   }
 
   function viewContact(){
+    const faqs = [
+      { q: "How long until my order ships?", a: "Each piece is finished to order. Timepieces are typically ready within 2&ndash;3 weeks; fragrances within a few days. You'll be told an exact date when your order is confirmed on WhatsApp." },
+      { q: "How does payment work?", a: "You place your order, then send payment via bKash and confirm the transaction ID directly with us on WhatsApp. Nothing is charged automatically." },
+      { q: "Can I return or exchange a piece?", a: "Yes &mdash; reach out within 7 days of delivery. Since each piece is finished by hand, we ask that it be unworn and in its original condition." },
+      { q: "Do you ship outside Bangladesh?", a: "Not yet. For now, the atelier ships within Bangladesh only &mdash; message us on WhatsApp if you're enquiring from abroad, as this may change." },
+    ];
     return `
       <section class="contact page-top">
         <div class="section-head reveal">
@@ -326,6 +444,32 @@
             <span class="contact-label">Shop</span>
             <span class="contact-value">Facebook Shop</span>
           </a>
+        </div>
+      </section>
+
+      <section class="collection alt subsection">
+        <div class="section-head reveal">
+          <span class="hour-mark">&mdash;</span>
+          <h2>Questions of the Order</h2>
+        </div>
+        <div class="faq-list">
+          ${faqs.map((f,i) => `
+            <div class="faq-item" data-faq="${i}">
+              <button type="button" class="faq-q" data-action="faq-toggle">${f.q}<span class="plus">+</span></button>
+              <div class="faq-a"><p>${f.a}</p></div>
+            </div>`).join("")}
+        </div>
+      </section>
+
+      <section class="collection subsection">
+        <div class="correspondence">
+          <span class="hour-mark">&#9993;</span>
+          <h2 style="margin-top:18px;">Join the Correspondence</h2>
+          <p class="section-note">Be first to hear when a new commission opens.</p>
+          <form id="correspondence-form" class="correspondence-form">
+            <input type="email" name="email" placeholder="you@example.com" required autocomplete="email">
+            <button type="submit" class="btn-primary">Subscribe</button>
+          </form>
         </div>
       </section>`;
   }
@@ -459,6 +603,7 @@
     if(action === "quick-add"){
       window.NoirCart.add(actionEl.dataset.id, 1);
       if(window.NoirAudio) window.NoirAudio.addToCart();
+      stampWaxSeal(e.clientX, e.clientY);
       toast(`Added ${productBy(actionEl.dataset.id)?.name || "item"} to cart`);
     }
 
@@ -467,6 +612,7 @@
       const qty = stepper ? parseInt(stepper.dataset.qty, 10) : 1;
       window.NoirCart.add(actionEl.dataset.id, qty);
       if(window.NoirAudio) window.NoirAudio.addToCart();
+      stampWaxSeal(e.clientX, e.clientY);
       toast(`Added ${qty} \u00d7 ${productBy(actionEl.dataset.id)?.name || "item"} to cart`);
     }
 
@@ -491,7 +637,100 @@
       if(window.NoirAudio) window.NoirAudio.remove();
       window.NoirCart.remove(actionEl.dataset.id);
     }
+
+    if(action === "faq-toggle"){
+      const item = actionEl.closest(".faq-item");
+      const answer = item.querySelector(".faq-a");
+      const isOpen = item.classList.contains("open");
+      // close any other open FAQ item for a cleaner reveal
+      document.querySelectorAll(".faq-item.open").forEach(openItem => {
+        if(openItem !== item){
+          openItem.classList.remove("open");
+          openItem.querySelector(".faq-a").style.maxHeight = null;
+        }
+      });
+      if(isOpen){
+        item.classList.remove("open");
+        answer.style.maxHeight = null;
+      } else {
+        item.classList.add("open");
+        answer.style.maxHeight = answer.scrollHeight + "px";
+      }
+      if(window.NoirAudio) window.NoirAudio.hover();
+    }
   });
+
+  /* ---------------------------------------------------------
+     Wax-seal stamp — visual confirmation on add-to-cart
+  --------------------------------------------------------- */
+  function stampWaxSeal(x, y){
+    const seal = document.createElement("div");
+    seal.className = "wax-seal";
+    seal.style.left = x + "px";
+    seal.style.top = y + "px";
+    seal.textContent = "N&A";
+    document.body.appendChild(seal);
+    requestAnimationFrame(() => seal.classList.add("stamp"));
+    setTimeout(() => seal.remove(), 750);
+  }
+
+  /* ---------------------------------------------------------
+     Correspondence (newsletter) capture — stored locally
+  --------------------------------------------------------- */
+  document.addEventListener("submit", (e) => {
+    if(e.target.id !== "correspondence-form") return;
+    e.preventDefault();
+    const email = new FormData(e.target).get("email");
+    if(!email) return;
+    const list = JSON.parse(localStorage.getItem("noir-aurum-subscribers") || "[]");
+    if(!list.includes(email)) list.push(email);
+    localStorage.setItem("noir-aurum-subscribers", JSON.stringify(list));
+    if(window.NoirAudio) window.NoirAudio.checkoutSuccess();
+    toast("You've joined the correspondence list");
+    e.target.reset();
+  });
+
+  /* ---------------------------------------------------------
+     Product card 3D tilt (mousemove) — desktop only
+  --------------------------------------------------------- */
+  const isFinePointer = window.matchMedia("(pointer: fine)").matches;
+  if(isFinePointer && !reduceMotion){
+    document.addEventListener("mousemove", (e) => {
+      const card = e.target.closest(".p-card");
+      document.querySelectorAll(".p-card.tilting").forEach(c => {
+        if(c !== card){ c.style.transform = ""; c.classList.remove("tilting"); }
+      });
+      if(!card) return;
+      const rect = card.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5;
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+      card.classList.add("tilting");
+      card.style.transform = `translateY(-4px) rotateY(${px*10}deg) rotateX(${-py*10}deg)`;
+    });
+    document.addEventListener("mouseout", (e) => {
+      const card = e.target.closest(".p-card");
+      if(card && !card.contains(e.relatedTarget)){
+        card.style.transform = "";
+        card.classList.remove("tilting");
+      }
+    });
+  }
+
+  /* ---------------------------------------------------------
+     Hero cursor-follow spotlight
+  --------------------------------------------------------- */
+  if(isFinePointer && !reduceMotion){
+    document.addEventListener("mousemove", (e) => {
+      const spotlight = document.getElementById("hero-spotlight");
+      if(!spotlight) return;
+      const hero = spotlight.closest(".hero");
+      const rect = hero.getBoundingClientRect();
+      const mx = ((e.clientX - rect.left) / rect.width) * 100;
+      const my = ((e.clientY - rect.top) / rect.height) * 100;
+      spotlight.style.setProperty("--mx", mx + "%");
+      spotlight.style.setProperty("--my", my + "%");
+    });
+  }
 
   document.addEventListener("submit", (e) => {
     if(e.target.id !== "checkout-form") return;
@@ -637,7 +876,7 @@
 
     const particles = [];
     const MAX_PARTICLES = 30;
-    const goldTones = ["199,163,86", "239,215,154", "138,115,69"];
+    const goldTones = ["201,162,75", "240,212,136", "138,115,69", "138,31,46"];
 
     function spawn(x, y, burst){
       particles.push({

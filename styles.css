@@ -1,21 +1,27 @@
 /* ============================================================
    NOIR & AURUM — design tokens
-   Void #0B0A0D / Char #17151A / Smoke #3A3630
-   Gold #C7A356 / Gold-bright #EFD79A / Bone #EAE3D3
+   "An Empire of Knights" — obsidian navy, old wine, antique gold
+   Void #0A0B10 / Char #12141C / Steel #3D4250 / Burgundy #5C1420
+   Gold #C9A24B / Gold-bright #F0D488 / Bone (parchment) #ECE4D2
    Display: Fraunces · Body: Manrope · Utility: Space Mono
    ============================================================ */
 
 :root{
-  --void: #0b0a0d;
-  --char: #17151a;
-  --char-2: #1e1b21;
-  --smoke: #3a3630;
-  --hairline: #2a2620;
-  --gold: #c7a356;
-  --gold-bright: #efd79a;
+  --void: #0a0b10;
+  --char: #12141c;
+  --char-2: #171a24;
+  --smoke: #3d4250;
+  --hairline: #23262f;
+  --gold: #c9a24b;
+  --gold-bright: #f0d488;
   --gold-dim: #8a7345;
-  --bone: #eae3d3;
-  --bone-dim: #a89f8d;
+  --bone: #ece4d2;
+  --bone-dim: #9c9a8f;
+
+  --burgundy: #5c1420;
+  --burgundy-bright: #8a1f2e;
+  --burgundy-dim: #3a0d16;
+  --steel: #3d4250;
 
   --display: 'Fraunces', serif;
   --body: 'Manrope', sans-serif;
@@ -54,8 +60,20 @@ body::before{
   pointer-events:none;
   z-index:2;
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(199,163,86,0.05), transparent 55%),
-    radial-gradient(ellipse at 50% 100%, rgba(0,0,0,0.5), transparent 60%);
+    radial-gradient(ellipse at 50% 0%, rgba(201,162,75,0.06), transparent 55%),
+    radial-gradient(ellipse at 15% 40%, rgba(92,20,32,0.10), transparent 50%),
+    radial-gradient(ellipse at 85% 65%, rgba(92,20,32,0.08), transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(0,0,0,0.55), transparent 60%);
+}
+
+/* cursor-follow spotlight, hero only */
+.hero-spotlight{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:radial-gradient(circle 420px at var(--mx,50%) var(--my,30%), rgba(201,162,75,.10), transparent 65%);
+  transition:background .15s linear;
+  z-index:0;
 }
 
 /* ============================== canvas smoke layer ============================== */
@@ -166,6 +184,7 @@ body::before{
   z-index:3;
 }
 .hero-mark{
+  position:relative;
   width:min(260px, 55vw);
   aspect-ratio:1;
   margin-bottom:18px;
@@ -262,7 +281,7 @@ body::before{
   margin:0 auto;
   padding:120px 24px;
 }
-.collection.alt{ background:linear-gradient(180deg, transparent, rgba(199,163,86,.03), transparent); }
+.collection.alt{ background:linear-gradient(180deg, transparent, rgba(201,162,75,.03), transparent); }
 
 .section-head{
   max-width:640px;
@@ -321,7 +340,7 @@ body::before{
   transition:opacity .7s var(--ease), transform .7s var(--ease),
              border-color .35s var(--ease), box-shadow .35s var(--ease);
 }
-.p-card.in-view{ opacity:1; transform:translateY(0); }
+.p-card.in-view{ opacity:1; transform:translateY(0); transition:border-color .35s var(--ease), box-shadow .35s var(--ease), transform .15s ease-out; }
 .p-card:hover{
   border-color:var(--gold-dim);
   box-shadow:0 0 0 1px rgba(199,163,86,.15), 0 18px 40px -20px rgba(199,163,86,.35);
@@ -696,7 +715,8 @@ body::before{
   position:fixed; inset:0;
   z-index:100;
   background:
-    radial-gradient(circle at var(--ox,50%) var(--oy,50%), rgba(199,163,86,.14), transparent 45%),
+    radial-gradient(circle at var(--ox,50%) var(--oy,50%), rgba(201,162,75,.16), transparent 40%),
+    radial-gradient(circle at var(--ox,50%) var(--oy,50%), rgba(92,20,32,.35), transparent 65%),
     var(--void);
   clip-path:circle(0px at 50% 50%);
   pointer-events:none;
@@ -715,4 +735,287 @@ body::before{
   .cart-row .qty-stepper{ grid-column:2; justify-self:start; }
   .cart-row .cart-line-total{ grid-column:3; grid-row:1; }
   .cart-row .cart-remove{ grid-column:3; grid-row:2; justify-self:end; }
+}
+
+/* ============================================================
+   NOIR & AURUM — v3 additions: heraldic theme, marquee, pillars,
+   heritage timeline, testimonials, FAQ, tilt cards, wax seal
+   ============================================================ */
+
+/* heraldic shield frame around the hero mark */
+.shield-frame{
+  position:absolute;
+  inset:-14%;
+  z-index:-1;
+  opacity:0;
+  animation:fadeUp 1.2s var(--ease) 2.6s forwards;
+}
+.shield-frame svg{ width:100%; height:100%; }
+.shield-frame path{
+  fill:none;
+  stroke:var(--burgundy-bright);
+  stroke-width:1;
+  opacity:.5;
+}
+
+/* ---------------- marquee ribbon ---------------- */
+.marquee{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(90deg, var(--burgundy-dim), var(--burgundy) 50%, var(--burgundy-dim));
+  border-top:1px solid var(--gold-dim);
+  border-bottom:1px solid var(--gold-dim);
+  padding:14px 0;
+  z-index:3;
+}
+.marquee-track{
+  display:flex;
+  width:max-content;
+  animation:marquee 32s linear infinite;
+}
+.marquee-track span{
+  display:inline-flex;
+  align-items:center;
+  font-family:var(--mono);
+  font-size:.75rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--gold-bright);
+  white-space:nowrap;
+  padding:0 28px;
+}
+.marquee-track span::after{
+  content:"\2726";
+  margin-left:28px;
+  color:var(--gold-dim);
+}
+@keyframes marquee{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+@media (prefers-reduced-motion: reduce){ .marquee-track{ animation:none; } }
+
+/* ---------------- pillars ("Codes of the Order") ---------------- */
+.pillars{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(240px,1fr));
+  gap:24px;
+}
+.pillar{
+  perspective:900px;
+}
+.pillar-inner{
+  background:var(--char);
+  border:1px solid var(--hairline);
+  border-top:2px solid var(--gold-dim);
+  padding:36px 28px;
+  text-align:center;
+  transform:rotateX(0) rotateY(0);
+  transition:transform .25s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease);
+  will-change:transform;
+}
+.pillar-inner:hover{
+  border-color:var(--gold);
+  box-shadow:0 24px 50px -28px rgba(201,162,75,.4);
+}
+.pillar-icon{
+  width:44px; height:44px; margin:0 auto 20px;
+  color:var(--gold);
+}
+.pillar-icon svg{ width:100%; height:100%; }
+.pillar h3{
+  font-family:var(--display);
+  font-size:1.2rem;
+  font-weight:500;
+  margin-bottom:10px;
+}
+.pillar p{ color:var(--bone-dim); font-size:.9rem; }
+.pillar-num{
+  display:block;
+  font-family:var(--mono);
+  font-size:.68rem;
+  letter-spacing:.16em;
+  color:var(--burgundy-bright);
+  margin-bottom:16px;
+}
+
+/* ---------------- heritage timeline ---------------- */
+.timeline{
+  position:relative;
+  max-width:760px;
+  margin:0 auto;
+  padding-left:2px;
+}
+.timeline::before{
+  content:"";
+  position:absolute;
+  left:19px; top:6px; bottom:6px;
+  width:1px;
+  background:linear-gradient(var(--hairline), var(--gold-dim), var(--hairline));
+}
+.timeline-item{
+  position:relative;
+  padding:0 0 44px 56px;
+}
+.timeline-item:last-child{ padding-bottom:0; }
+.timeline-dot{
+  position:absolute;
+  left:11px; top:2px;
+  width:17px; height:17px;
+  border-radius:50%;
+  background:var(--void);
+  border:2px solid var(--gold);
+}
+.timeline-item h4{
+  font-family:var(--mono);
+  font-size:.72rem;
+  letter-spacing:.1em;
+  color:var(--gold-bright);
+  margin-bottom:6px;
+  text-transform:uppercase;
+}
+.timeline-item h3{
+  font-family:var(--display);
+  font-size:1.15rem;
+  font-weight:500;
+  margin-bottom:8px;
+}
+.timeline-item p{ color:var(--bone-dim); font-size:.92rem; max-width:52ch; }
+
+/* ---------------- testimonials ---------------- */
+.testimonials{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(280px,1fr));
+  gap:22px;
+}
+.testimonial{
+  background:var(--char);
+  border:1px solid var(--hairline);
+  padding:30px 26px;
+  position:relative;
+}
+.testimonial::before{
+  content:"\275D";
+  position:absolute;
+  top:14px; left:20px;
+  font-family:var(--display);
+  font-size:2.6rem;
+  color:var(--burgundy-bright);
+  opacity:.5;
+  line-height:1;
+}
+.testimonial p{
+  color:var(--bone-dim);
+  font-size:.95rem;
+  font-style:italic;
+  margin:26px 0 18px;
+}
+.testimonial cite{
+  font-family:var(--mono);
+  font-size:.7rem;
+  letter-spacing:.08em;
+  color:var(--gold-dim);
+  font-style:normal;
+  text-transform:uppercase;
+}
+
+/* ---------------- FAQ accordion ---------------- */
+.faq-list{ max-width:720px; margin:0 auto; display:flex; flex-direction:column; gap:2px; }
+.faq-item{ border-bottom:1px solid var(--hairline); }
+.faq-q{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  background:none;
+  border:none;
+  color:var(--bone);
+  font-family:var(--display);
+  font-size:1.02rem;
+  text-align:left;
+  padding:22px 4px;
+  cursor:pointer;
+}
+.faq-q .plus{
+  flex:none;
+  font-family:var(--mono);
+  color:var(--gold);
+  font-size:1.2rem;
+  transition:transform .35s var(--ease);
+}
+.faq-item.open .faq-q .plus{ transform:rotate(135deg); color:var(--burgundy-bright); }
+.faq-a{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .4s var(--ease);
+}
+.faq-a p{
+  color:var(--bone-dim);
+  font-size:.92rem;
+  padding:0 4px 22px;
+  max-width:60ch;
+}
+
+/* ---------------- newsletter / correspondence ---------------- */
+.correspondence{
+  max-width:520px;
+  margin:0 auto;
+  text-align:center;
+}
+.correspondence-form{
+  display:flex;
+  gap:10px;
+  margin-top:24px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.correspondence-form input{
+  flex:1 1 240px;
+  font-family:var(--body);
+  font-size:.9rem;
+  color:var(--bone);
+  background:var(--char);
+  border:1px solid var(--hairline);
+  padding:13px 16px;
+  border-radius:2px;
+}
+.correspondence-form input:focus{ border-color:var(--gold); outline:none; }
+
+/* ---------------- product card 3D tilt ---------------- */
+.p-card{ transform-style:preserve-3d; }
+
+/* ---------------- wax seal stamp (add-to-cart feedback) ---------------- */
+.wax-seal{
+  position:fixed;
+  z-index:90;
+  width:54px; height:54px;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, var(--burgundy-bright), var(--burgundy-dim) 70%);
+  border:1px solid var(--gold-dim);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--gold-bright);
+  font-family:var(--display);
+  font-style:italic;
+  font-size:1rem;
+  pointer-events:none;
+  transform:translate(-50%,-50%) scale(0) rotate(-25deg);
+  opacity:0;
+  box-shadow:0 10px 30px -6px rgba(0,0,0,.6);
+}
+.wax-seal.stamp{
+  animation:stampDown .7s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes stampDown{
+  0%{ transform:translate(-50%,-50%) scale(2.6) rotate(-25deg); opacity:0; }
+  35%{ transform:translate(-50%,-50%) scale(0.92) rotate(-8deg); opacity:1; }
+  55%{ transform:translate(-50%,-50%) scale(1.05) rotate(-8deg); opacity:1; }
+  100%{ transform:translate(-50%,-50%) scale(1) rotate(-8deg) translateY(-30px); opacity:0; }
+}
+
+/* ---------------- section rhythm (longer, more generous pacing) ---------------- */
+.collection, .atelier, .contact{ padding-top:130px; padding-bottom:130px; }
+.subsection{ margin-top:110px; }
+.subsection:first-child{ margin-top:0; }
+
+@media (prefers-reduced-motion: reduce){
+  .wax-seal.stamp{ animation:none; opacity:1; transform:translate(-50%,-50%) scale(1); }
+  .pillar-inner{ transition:none; }
 }
