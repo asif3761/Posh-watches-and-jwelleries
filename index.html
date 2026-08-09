@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noir &amp; Aurum — Watches &amp; Fragrance</title>
+<meta name="description" content="Noir &amp; Aurum — a house of watches and fragrance. Timepieces measured in restraint, scent worn like memory. Message us on WhatsApp to order.">
+<meta property="og:title" content="Noir &amp; Aurum">
+<meta property="og:description" content="A house of watches and fragrance.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230b0b0c'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23c6a15b' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%23c6a15b'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&amp;family=Jost:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0b0b0c;
+    --charcoal:#17140f;
+    --charcoal-2:#1f1b15;
+    --smoke:#4a443c;
+    --aurum:#c6a15b;
+    --aurum-bright:#e8c77e;
+    --ivory:#ede6d6;
+    --ivory-dim:#b8ae9c;
+    --header-h:76px;
+    --font-display:'Cormorant Garamond', serif;
+    --font-body:'Jost', sans-serif;
+  }
+  *,*::before,*::after{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; background:var(--void); color:var(--ivory);
+    font-family:var(--font-body); font-weight:300;
+    padding-top:var(--header-h); overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{ color:inherit; }
+  img,svg{ display:block; max-width:100%; }
+  ::-webkit-scrollbar{ width:10px; }
+  ::-webkit-scrollbar-track{ background:var(--void); }
+  ::-webkit-scrollbar-thumb{ background:rgba(198,161,91,.3); border-radius:5px; }
+  ::-webkit-scrollbar-thumb:hover{ background:rgba(198,161,91,.5); }
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible{
+    outline:2px solid var(--aurum-bright); outline-offset:3px; border-radius:2px;
+  }
+
+  /* ---------- transition system ---------- */
+  #transition-curtain{
+    position:fixed; inset:0; background:var(--void);
+    opacity:0; pointer-events:none; z-index:9998;
+    transition:opacity .5s cubic-bezier(.4,0,.2,1);
+  }
+  #transition-curtain.active{ opacity:.97; }
+  #smoke-canvas{
+    position:fixed; inset:0; z-index:9999; pointer-events:none;
+  }
+
+  /* ---------- header ---------- */
+  .site-header{
+    position:fixed; top:0; left:0; right:0; height:var(--header-h);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 5vw; background:rgba(11,11,12,.85); backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(198,161,91,.15); z-index:500;
+  }
+  .brand{ display:flex; align-items:center; gap:12px; text-decoration:none; }
+  .crest{ position:relative; width:38px; height:38px; flex:0 0 auto; }
+  .crest-ring{ position:absolute; inset:0; border:1.5px solid var(--aurum); border-radius:50%; }
+  .crest-mark{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:12px; letter-spacing:1px; color:var(--aurum-bright);
+  }
+  .brand-word{ font-family:var(--font-display); font-size:20px; letter-spacing:.4px; color:var(--ivory); }
+  .brand-word em{ font-style:normal; color:var(--aurum); }
+  .site-nav{ display:flex; gap:30px; }
+  .nav-link{
+    font-size:12px; letter-spacing:1.6px; text-transform:uppercase; text-decoration:none;
+    color:var(--ivory-dim); position:relative; padding:6px 0;
+  }
+  .nav-link::after{
+    content:''; position:absolute; left:0; bottom:0; width:0; height:1px;
+    background:var(--aurum-bright); transition:width .3s;
+  }
+  .nav-link:hover{ color:var(--ivory); }
+  .nav-link:hover::after, .nav-link.active::after{ width:100%; }
+  .nav-link.active{ color:var(--ivory); }
+  .header-actions{ display:flex; align-items:center; gap:16px; }
+  .sound-toggle, .menu-toggle{
+    background:none; border:none; color:var(--ivory-dim); cursor:pointer; padding:6px;
+  }
+  .sound-toggle:hover, .menu-toggle:hover{ color:var(--aurum-bright); }
+  .sound-toggle svg{ width:20px; height:20px; }
+  .sound-toggle .icon-sound-off{ display:none; }
+  .sound-toggle.muted .icon-sound-on{ display:none; }
+  .sound-toggle.muted .icon-sound-off{ display:block; }
+  .menu-toggle{ display:none; flex-direction:column; gap:5px; }
+  .menu-toggle span{ width:22px; height:2px; background:var(--ivory); transition:.3s; }
+  .menu-toggle.open span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+  .menu-toggle.open span:nth-child(2){ opacity:0; }
+  .menu-toggle.open span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+  /* ---------- pages ---------- */
+  .page{ display:none; padding:64px 6vw 40px; min-height:calc(100vh - var(--header-h)); }
+  .page.active{ display:block; animation:pageIn .55s ease both; }
+  @keyframes pageIn{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+
+  .section-eyebrow{ font-size:12px; letter-spacing:3px; text-transform:uppercase; color:var(--aurum); }
+  .section-title{ font-family:var(--font-display); font-weight:500; font-size:clamp(2rem,5vw,3.2rem); margin:10px 0 18px; }
+  .section-intro{ max-width:620px; color:var(--ivory-dim); line-height:1.75; font-size:15px; }
+  .divider{ height:1px; background:linear-gradient(90deg,transparent,rgba(198,161,91,.4),transparent); margin:64px 0; }
+
+  /* ---------- hero (home) ---------- */
+  .hero{
+    position:relative; min-height:78vh; display:flex; align-items:center; justify-content:center;
+    text-align:center; overflow:hidden; margin:-64px -6vw 0; padding:64px 6vw;
+  }
+  .ambient-wisp{ position:absolute; border-radius:50%; filter:blur(60px); opacity:.3; animation:driftA 20s ease-in-out infinite; }
+  .ambient-wisp.gold{ background:radial-gradient(circle, var(--aurum) 0%, transparent 70%); width:420px; height:420px; top:-10%; left:-8%; }
+  .ambient-wisp.smoke{ background:radial-gradient(circle, var(--smoke) 0%, transparent 70%); width:520px; height:520px; bottom:-16%; right:-10%; animation-duration:26s; animation-delay:-6s; }
+  @keyframes driftA{ 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(40px,-30px) scale(1.15); } }
+  .hero-inner{ position:relative; z-index:1; max-width:760px; margin:0 auto; }
+  .hero-eyebrow{ font-size:12px; letter-spacing:4px; text-transform:uppercase; color:var(--aurum); animation:fadeUp .7s ease both; }
+  .hero-title{ font-family:var(--font-display); font-weight:500; font-size:clamp(2.6rem,6.5vw,5rem); line-height:1.05; margin:20px 0; animation:fadeUp .7s .1s ease both; }
+  .hero-title em{ font-style:italic; color:var(--aurum-bright); }
+  .hero-sub{ max-width:520px; margin:0 auto; color:var(--ivory-dim); font-size:16px; line-height:1.7; animation:fadeUp .7s .2s ease both; }
+  .hero-ctas{ display:flex; gap:18px; flex-wrap:wrap; justify-content:center; margin-top:40px; animation:fadeUp .7s .3s ease both; }
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(16px); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion:reduce){
+    .ambient-wisp{ animation:none; }
+    .hero-eyebrow,.hero-title,.hero-sub,.hero-ctas,.page.active{ animation:none; }
+  }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; padding:14px 30px;
+    font-family:var(--font-body); font-size:12px; letter-spacing:1.6px; text-transform:uppercase;
+    text-decoration:none; border-radius:2px; cursor:pointer; transition:all .3s cubic-bezier(.4,0,.2,1);
+  }
+  .btn-primary{ background:var(--aurum); color:var(--void); border:1px solid var(--aurum); }
+  .btn-primary:hover{ background:var(--aurum-bright); border-color:var(--aurum-bright); transform:translateY(-2px); box-shadow:0 10px 26px rgba(198,161,91,.25); }
+  .btn-ghost{ background:transparent; color:var(--ivory); border:1px solid rgba(237,230,214,.3); }
+  .btn-ghost:hover{ border-color:var(--aurum); color:var(--aurum-bright); transform:translateY(-2px); }
+
+  /* ---------- chapters split (home) ---------- */
+  .chapters{
+    display:grid; grid-template-columns:1fr 1fr; gap:1px; margin:96px -6vw 0;
+    background:rgba(198,161,91,.15); border-top:1px solid rgba(198,161,91,.15); border-bottom:1px solid rgba(198,161,91,.15);
+  }
+  .chapter-panel{ background:var(--void); padding:64px 40px; text-align:center; text-decoration:none; color:var(--ivory); transition:background .3s; }
+  .chapter-panel:hover{ background:var(--charcoal); }
+  .chapter-num{ font-family:var(--font-display); font-size:14px; color:var(--aurum); letter-spacing:2px; }
+  .chapter-icon{ width:56px; height:56px; margin:20px auto; color:var(--aurum); }
+  .chapter-title{ font-family:var(--font-display); font-weight:500; font-size:28px; margin:6px 0 12px; }
+  .chapter-desc{ color:var(--ivory-dim); font-size:14px; line-height:1.7; max-width:320px; margin:0 auto 22px; }
+  .chapter-link{ font-size:12px; letter-spacing:1.6px; text-transform:uppercase; color:var(--aurum-bright); }
+  @media (max-width:760px){ .chapters{ grid-template-columns:1fr; } }
+
+  .closing-banner{ text-align:center; padding:88px 6px 40px; }
+  .closing-banner p{ color:var(--ivory-dim); margin-bottom:26px; }
+
+  /* ---------- product grids ---------- */
+  .product-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:22px; margin-top:52px; }
+  .product-card{
+    background:var(--charcoal-2); border:1px solid rgba(198,161,91,.12); border-radius:4px;
+    padding:40px 22px; text-align:center; transition:transform .3s, border-color .3s, box-shadow .3s;
+  }
+  .product-card:hover, .product-card:focus-visible{ transform:translateY(-6px); border-color:rgba(198,161,91,.4); box-shadow:0 18px 34px rgba(0,0,0,.4); }
+  .product-icon{ width:52px; height:52px; margin:0 auto 18px; color:var(--aurum); }
+  .product-name{ font-family:var(--font-display); font-size:19px; color:var(--ivory); letter-spacing:.4px; }
+  .product-status{ margin-top:8px; font-size:10px; letter-spacing:1.6px; text-transform:uppercase; color:var(--ivory-dim); }
+  .grid-note{ margin-top:44px; text-align:center; color:var(--ivory-dim); font-size:14px; }
+
+  /* ---------- house (about) ---------- */
+  .house-copy{ max-width:680px; margin:44px 0; color:var(--ivory-dim); line-height:1.85; font-size:15.5px; }
+  .house-copy p{ margin-bottom:20px; }
+  .pull-quote{
+    font-family:var(--font-display); font-style:italic; color:var(--aurum-bright);
+    font-size:clamp(1.3rem,3vw,1.9rem); max-width:680px; line-height:1.55; margin:56px 0;
+  }
+
+  /* ---------- acquire ---------- */
+  .acquire-grid{ display:grid; grid-template-columns:1.1fr .9fr; gap:32px; margin-top:48px; align-items:start; }
+  .acquire-card{ background:var(--charcoal-2); border:1px solid rgba(198,161,91,.12); border-radius:4px; padding:34px; }
+  .acquire-card h3{ font-family:var(--font-display); font-weight:500; font-size:21px; margin:0 0 16px; color:var(--aurum-bright); }
+  .steps{ list-style:none; counter-reset:step; margin:22px 0 0; padding:0; }
+  .steps li{ counter-increment:step; position:relative; padding-left:42px; margin-bottom:18px; color:var(--ivory-dim); font-size:14px; line-height:1.65; }
+  .steps li::before{
+    content:counter(step); position:absolute; left:0; top:-2px; width:26px; height:26px; border:1px solid var(--aurum);
+    border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:13px; color:var(--aurum-bright);
+  }
+  .contact-actions{ display:flex; flex-direction:column; gap:14px; margin-top:8px; }
+  .copy-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; background:rgba(0,0,0,.3);
+    border:1px dashed rgba(198,161,91,.3); padding:12px 14px; border-radius:4px; font-size:13px; color:var(--ivory);
+  }
+  .copy-btn{
+    background:none; border:1px solid var(--aurum); color:var(--aurum-bright); font-size:10px; letter-spacing:1.4px;
+    text-transform:uppercase; padding:7px 12px; border-radius:2px; cursor:pointer; white-space:nowrap; transition:.25s;
+  }
+  .copy-btn:hover{ background:var(--aurum); color:var(--void); }
+  .field-note{ font-size:12px; color:var(--ivory-dim); margin-top:8px; line-height:1.6; }
+  .bkash-box{
+    border:1px dashed rgba(198,161,91,.35); border-radius:4px; padding:16px 18px; margin-top:6px;
+    font-family:monospace,monospace; font-size:14px; letter-spacing:.5px; color:var(--ivory-dim);
+  }
+
+  /* ---------- footer ---------- */
+  .site-footer{
+    border-top:1px solid rgba(198,161,91,.15); padding:36px 6vw; display:flex; flex-wrap:wrap;
+    justify-content:space-between; align-items:center; gap:16px; color:var(--ivory-dim); font-size:12px;
+  }
+  .footer-links{ display:flex; gap:22px; flex-wrap:wrap; }
+  .footer-links a{ text-decoration:none; color:var(--ivory-dim); transition:color .2s; }
+  .footer-links a:hover{ color:var(--aurum-bright); }
+
+  /* ---------- responsive nav ---------- */
+  @media (max-width:860px){
+    .site-nav{
+      position:fixed; inset:var(--header-h) 0 0 0; background:var(--void); z-index:400;
+      flex-direction:column; align-items:flex-start; gap:26px; padding:40px 8vw;
+      transform:translateX(100%); transition:transform .35s ease;
+    }
+    .site-nav.open{ transform:translateX(0); }
+    .nav-link{ font-size:16px; }
+    .menu-toggle{ display:flex; }
+    .chapters{ margin-top:64px; }
+    .acquire-grid{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="transition-curtain" aria-hidden="true"></div>
+<canvas id="smoke-canvas" aria-hidden="true"></canvas>
+
+<header class="site-header">
+  <a href="#home" class="brand" data-nav="home">
+    <span class="crest"><span class="crest-ring"></span><span class="crest-mark">N·A</span></span>
+    <span class="brand-word">Noir <em>&amp;</em> Aurum</span>
+  </a>
+  <nav class="site-nav" id="site-nav">
+    <a href="#home" class="nav-link" data-nav="home">Home</a>
+    <a href="#hours" class="nav-link" data-nav="hours">The Hours</a>
+    <a href="#scent" class="nav-link" data-nav="scent">The Scent</a>
+    <a href="#house" class="nav-link" data-nav="house">The House</a>
+    <a href="#acquire" class="nav-link" data-nav="acquire">Acquire</a>
+  </nav>
+  <div class="header-actions">
+    <button id="sound-toggle" class="sound-toggle" type="button" aria-pressed="false" aria-label="Toggle sound effects">
+      <svg class="icon-sound-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4z" fill="currentColor"/><path d="M16 8a5 5 0 0 1 0 8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M18.5 5.5a9 9 0 0 1 0 13" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".6"/></svg>
+      <svg class="icon-sound-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4z" fill="currentColor"/><path d="M15 9l6 6M21 9l-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <!-- HOME -->
+  <section class="page active" data-page="home">
+    <div class="hero">
+      <span class="ambient-wisp gold"></span>
+      <span class="ambient-wisp smoke"></span>
+      <div class="hero-inner">
+        <p class="hero-eyebrow">Established in Shadow &amp; Gold</p>
+        <h1 class="hero-title">Where Time<br>Wears <em>Scent.</em></h1>
+        <p class="hero-sub">Noir &amp; Aurum crafts two disciplines into one house — watches built for the hour, and fragrances built for the moment after.</p>
+        <div class="hero-ctas">
+          <a href="#hours" class="btn btn-primary" data-nav="hours">Enter The Hours</a>
+          <a href="#scent" class="btn btn-ghost" data-nav="scent">Enter The Scent</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapters">
+      <a href="#hours" class="chapter-panel" data-nav="hours">
+        <p class="chapter-num">I.</p>
+        <svg class="chapter-icon" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="28" fill="none" stroke="currentColor" stroke-width="2"/><line x1="50" y1="50" x2="50" y2="32" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="50" y1="50" x2="62" y2="54" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="50" cy="50" r="2" fill="currentColor"/><path d="M40 22 h20 v8 h-20 z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M40 80 h20 v8 h-20 z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        <h2 class="chapter-title">The Hours</h2>
+        <p class="chapter-desc">Timepieces measured in restraint — mechanical, minimal, unhurried.</p>
+        <span class="chapter-link">Explore The Collection →</span>
+      </a>
+      <a href="#scent" class="chapter-panel" data-nav="scent">
+        <p class="chapter-num">II.</p>
+        <svg class="chapter-icon" viewBox="0 0 100 100" aria-hidden="true"><rect x="40" y="10" width="20" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M38 22 h24 l4 10 v46 a6 6 0 0 1 -6 6 h-20 a6 6 0 0 1 -6 -6 v-46 z" fill="none" stroke="currentColor" stroke-width="2"/><line x1="34" y1="50" x2="66" y2="50" stroke="currentColor" stroke-width="1"/></svg>
+        <h2 class="chapter-title">The Scent</h2>
+        <p class="chapter-desc">Fragrance worn like memory — quiet, warm, and slow to fade.</p>
+        <span class="chapter-link">Explore The Collection →</span>
+      </a>
+    </div>
+
+    <div class="closing-banner">
+      <p class="section-eyebrow" style="display:block; text-align:center;">The Collection Is Being Prepared</p>
+      <p>Register your interest and we'll reach out the moment each chapter opens.</p>
+      <a href="https://wa.me/8801951467502?text=Hello%20Noir%20%26%20Aurum%2C%20I%27d%20like%20to%20know%20more%20about%20your%20collection." class="btn btn-primary" target="_blank" rel="noopener">Message on WhatsApp</a>
+    </div>
+  </section>
+
+  <!-- THE HOURS -->
+  <section class="page" data-page="hours">
+    <p class="section-eyebrow">I. Timepieces</p>
+    <h2 class="section-title">Measured in Restraint.</h2>
+    <p class="section-intro">Every Noir &amp; Aurum watch is built around a single idea: that time deserves to be told plainly. No clutter on the dial, no excess in the case — only what earns its place.</p>
+    <div class="product-grid" id="hours-grid"></div>
+    <p class="grid-note">Curating the debut line now. Message us on WhatsApp to be first notified.</p>
+    <div class="divider"></div>
+    <div style="text-align:center;">
+      <a href="https://wa.me/8801951467502?text=Hello%20Noir%20%26%20Aurum%2C%20I%27d%20like%20to%20know%20more%20about%20your%20collection." class="btn btn-ghost" target="_blank" rel="noopener">Ask About The Hours</a>
+    </div>
+  </section>
+
+  <!-- THE SCENT -->
+  <section class="page" data-page="scent">
+    <p class="section-eyebrow">II. Fragrance</p>
+    <h2 class="section-title">Worn Like Memory.</h2>
+    <p class="section-intro">Each accord is composed to sit close to the skin and linger in recollection rather than in the room. Warm woods, quiet amber, and a trace of smoke run through the house style.</p>
+    <div class="product-grid" id="scent-grid"></div>
+    <p class="grid-note">The first accords are being composed. Message us on WhatsApp to be first notified.</p>
+    <div class="divider"></div>
+    <div style="text-align:center;">
+      <a href="https://wa.me/8801951467502?text=Hello%20Noir%20%26%20Aurum%2C%20I%27d%20like%20to%20know%20more%20about%20your%20collection." class="btn btn-ghost" target="_blank" rel="noopener">Ask About The Scent</a>
+    </div>
+  </section>
+
+  <!-- THE HOUSE -->
+  <section class="page" data-page="house">
+    <p class="section-eyebrow">The House</p>
+    <h2 class="section-title">Two Crafts, One Hour.</h2>
+    <div class="house-copy">
+      <p>Noir &amp; Aurum began with a simple observation: a watch marks the hour, but a scent is what people remember about it. We build both under one roof so they're never an afterthought to each other.</p>
+      <p>Our watches favour dark dials, warm gold detailing, and mechanisms left uncluttered. Our fragrances follow the same instinct — a little smoke, a little warmth, nothing shouted.</p>
+      <p>We are a small house, still being built in the open. What you see here today is the beginning of that build — the collections are being finished by hand, chapter by chapter.</p>
+    </div>
+    <p class="pull-quote">"Gold catches the light. Smoke keeps the secret."</p>
+  </section>
+
+  <!-- ACQUIRE -->
+  <section class="page" data-page="acquire">
+    <p class="section-eyebrow">Acquire</p>
+    <h2 class="section-title">How To Reach The House.</h2>
+    <p class="section-intro">The collection is prepared to order, in small numbers. Here's how an acquisition works.</p>
+
+    <div class="acquire-grid">
+      <div class="acquire-card">
+        <h3>The Process</h3>
+        <ol class="steps">
+          <li>Message us on WhatsApp with the piece or accord you're interested in.</li>
+          <li>We confirm availability, pricing, and delivery timing with you directly.</li>
+          <li>Payment is made via bKash to secure your order.</li>
+          <li>We prepare and arrange delivery, and keep you updated throughout.</li>
+        </ol>
+      </div>
+
+      <div class="acquire-card">
+        <h3>Reach Us</h3>
+        <div class="contact-actions">
+          <a href="https://wa.me/8801951467502?text=Hello%20Noir%20%26%20Aurum%2C%20I%27d%20like%20to%20know%20more%20about%20your%20collection." class="btn btn-primary" target="_blank" rel="noopener" style="justify-content:center;">Message on WhatsApp</a>
+          <div class="copy-row">
+            <span>asifuzzaman3761@gmail.com</span>
+            <button class="copy-btn" data-copy="asifuzzaman3761@gmail.com" type="button">Copy</button>
+          </div>
+          <a href="#" class="btn btn-ghost" style="justify-content:center;">Shop on Facebook</a>
+        </div>
+      </div>
+
+      <div class="acquire-card" style="grid-column:1/-1;">
+        <h3>Payment via bKash</h3>
+        <p class="field-note">Send payment to the merchant number below once your order is confirmed over WhatsApp, then share your transaction ID with us to complete the order.</p>
+        <div class="bkash-box">bKash Merchant Number: 01XXX-XXXXXX</div>
+        <p class="field-note">— add your live bKash number here before publishing.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span>© <span id="footer-year"></span> Noir &amp; Aurum. All rights reserved.</span>
+  <div class="footer-links">
+    <a href="https://wa.me/8801951467502" target="_blank" rel="noopener">WhatsApp</a>
+    <a href="mailto:asifuzzaman3761@gmail.com">Email</a>
+    <a href="#" >Facebook</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- element refs ---------- */
+  var curtain = document.getElementById('transition-curtain');
+  var canvas = document.getElementById('smoke-canvas');
+  var ctx = canvas.getContext('2d');
+  var navPanel = document.getElementById('site-nav');
+  var menuToggle = document.getElementById('menu-toggle');
+  var soundToggle = document.getElementById('sound-toggle');
+
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+  /* ---------- icons ---------- */
+  var ICONS = {
+    watchA: '<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true"><circle cx="50" cy="50" r="28" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="50" cy="50" r="21" fill="none" stroke="currentColor" stroke-width="1"/><line x1="50" y1="50" x2="50" y2="32" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="50" y1="50" x2="62" y2="54" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="50" cy="50" r="2" fill="currentColor"/><path d="M40 22 h20 v8 h-20 z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M40 80 h20 v8 h-20 z" fill="none" stroke="currentColor" stroke-width="2"/><rect x="77" y="46" width="7" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+    watchB: '<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true"><rect x="28" y="28" width="44" height="44" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><rect x="35" y="35" width="30" height="30" rx="2" fill="none" stroke="currentColor" stroke-width="1"/><line x1="50" y1="50" x2="50" y2="38" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="50" y1="50" x2="58" y2="50" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M40 16 h20 v12 h-20 z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M40 72 h20 v12 h-20 z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>',
+    perfumeA: '<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true"><rect x="40" y="10" width="20" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="46" y="4" width="8" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M38 22 h24 l4 10 v46 a6 6 0 0 1 -6 6 h-20 a6 6 0 0 1 -6 -6 v-46 z" fill="none" stroke="currentColor" stroke-width="2"/><line x1="34" y1="50" x2="66" y2="50" stroke="currentColor" stroke-width="1"/></svg>',
+    perfumeB: '<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true"><ellipse cx="50" cy="62" rx="20" ry="24" fill="none" stroke="currentColor" stroke-width="2"/><rect x="44" y="26" width="12" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="50" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M50 8 v-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'
+  };
+
+  var watchReserves = [
+    {n:'01', icon:'watchA'}, {n:'02', icon:'watchB'}, {n:'03', icon:'watchA'},
+    {n:'04', icon:'watchB'}, {n:'05', icon:'watchA'}, {n:'06', icon:'watchB'}
+  ];
+  var scentAccords = [
+    {n:'01', icon:'perfumeA'}, {n:'02', icon:'perfumeB'}, {n:'03', icon:'perfumeA'},
+    {n:'04', icon:'perfumeB'}, {n:'05', icon:'perfumeA'}, {n:'06', icon:'perfumeB'}
+  ];
+
+  function renderGrid(list, containerId, label){
+    var el = document.getElementById(containerId);
+    if(!el) return;
+    el.innerHTML = list.map(function(item){
+      return '<article class="product-card" tabindex="0">' +
+        '<div class="product-icon">' + ICONS[item.icon] + '</div>' +
+        '<p class="product-name">' + label + ' No. ' + item.n + '</p>' +
+        '<p class="product-status">Coming to the collection</p>' +
+        '</article>';
+    }).join('');
+  }
+  renderGrid(watchReserves, 'hours-grid', 'Reserve');
+  renderGrid(scentAccords, 'scent-grid', 'Accord');
+
+  /* ---------- audio engine (synthesized, no external files) ---------- */
+  var audioCtx = null, masterGain = null, delayNode = null, feedbackGain = null, wetGain = null;
+  var muted = false;
+
+  function ensureAudio(){
+    if(audioCtx){
+      if(audioCtx.state === 'suspended'){ audioCtx.resume().catch(function(){}); }
+      return;
+    }
+    try{
+      var AC = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AC();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = muted ? 0 : 0.6;
+      masterGain.connect(audioCtx.destination);
+
+      delayNode = audioCtx.createDelay(1.0);
+      delayNode.delayTime.value = 0.22;
+      feedbackGain = audioCtx.createGain();
+      feedbackGain.gain.value = 0.22;
+      wetGain = audioCtx.createGain();
+      wetGain.gain.value = 0.16;
+      delayNode.connect(feedbackGain);
+      feedbackGain.connect(delayNode);
+      delayNode.connect(wetGain);
+      wetGain.connect(masterGain);
+    }catch(err){
+      audioCtx = null;
+    }
+  }
+
+  function playTransitionChime(){
+    if(!audioCtx || muted) return;
+    var t = audioCtx.currentTime;
+
+    var osc1 = audioCtx.createOscillator();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(98, t);
+    var g1 = audioCtx.createGain();
+    g1.gain.setValueAtTime(0.0001, t);
+    g1.gain.linearRampToValueAtTime(0.22, t + 0.06);
+    g1.gain.exponentialRampToValueAtTime(0.001, t + 1.6);
+    osc1.connect(g1); g1.connect(masterGain); g1.connect(delayNode);
+    osc1.start(t); osc1.stop(t + 1.7);
+
+    var osc2 = audioCtx.createOscillator();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(246, t);
+    var g2 = audioCtx.createGain();
+    g2.gain.setValueAtTime(0.0001, t);
+    g2.gain.linearRampToValueAtTime(0.08, t + 0.1);
+    g2.gain.exponentialRampToValueAtTime(0.001, t + 1.9);
+    osc2.connect(g2); g2.connect(masterGain);
+    osc2.start(t); osc2.stop(t + 2.0);
+
+    var bufferSize = Math.floor(audioCtx.sampleRate * 0.4);
+    var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    var data = buffer.getChannelData(0);
+    for(var i = 0; i < bufferSize; i++){
+      data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+    }
+    var noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+    var bandpass = audioCtx.createBiquadFilter();
+    bandpass.type = 'bandpass';
+    bandpass.frequency.value = 1400;
+    bandpass.Q.value = 0.9;
+    var gNoise = audioCtx.createGain();
+    gNoise.gain.setValueAtTime(0.14, t);
+    gNoise.gain.exponentialRampToValueAtTime(0.001, t + 0.42);
+    noise.connect(bandpass); bandpass.connect(gNoise); gNoise.connect(masterGain); gNoise.connect(delayNode);
+    noise.start(t);
+  }
+
+  var lastHover = 0;
+  function playHoverTick(){
+    if(!audioCtx || muted) return;
+    var now = performance.now();
+    if(now - lastHover < 140) return;
+    lastHover = now;
+    var t = audioCtx.currentTime;
+    var osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1600, t);
+    osc.frequency.exponentialRampToValueAtTime(1200, t + 0.05);
+    var g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.05, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+    osc.connect(g); g.connect(masterGain);
+    osc.start(t); osc.stop(t + 0.08);
+  }
+
+  function playClickThud(){
+    if(!audioCtx || muted) return;
+    var t = audioCtx.currentTime;
+    var osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(180, t);
+    osc.frequency.exponentialRampToValueAtTime(70, t + 0.18);
+    var g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.26, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+    osc.connect(g); g.connect(masterGain);
+    osc.start(t); osc.stop(t + 0.3);
+  }
+
+  soundToggle.addEventListener('click', function(){
+    muted = !muted;
+    ensureAudio();
+    if(masterGain){
+      masterGain.gain.setTargetAtTime(muted ? 0 : 0.6, audioCtx.currentTime, 0.05);
+    }
+    soundToggle.setAttribute('aria-pressed', String(muted));
+    soundToggle.classList.toggle('muted', muted);
+  });
+
+  /* ---------- smoke particles ---------- */
+  var particles = [];
+  var animId = null;
+
+  function resizeCanvas(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  function spawnParticles(ox, oy, count){
+    for(var i = 0; i < count; i++){
+      var isGold = Math.random() < 0.14;
+      particles.push({
+        x: ox + (Math.random() - 0.5) * 80,
+        y: oy + (Math.random() - 0.5) * 60,
+        r: 40 + Math.random() * 90,
+        vx: (Math.random() - 0.5) * 1.3,
+        vy: -0.7 - Math.random() * 1.5,
+        rot: Math.random() * Math.PI * 2,
+        vr: (Math.random() - 0.5) * 0.01,
+        alpha: 0,
+        targetAlpha: 0.35 + Math.random() * 0.35,
+        growth: 0.6 + Math.random() * 0.7,
+        phase: 'in',
+        isGold: isGold
+      });
+    }
+  }
+
+  function drawParticle(p){
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    var grad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.r);
+    if(p.isGold){
+      grad.addColorStop(0, 'rgba(232,199,126,' + p.alpha + ')');
+      grad.addColorStop(0.5, 'rgba(198,161,91,' + (p.alpha * 0.5) + ')');
+      grad.addColorStop(1, 'rgba(198,161,91,0)');
+    } else {
+      grad.addColorStop(0, 'rgba(60,55,48,' + p.alpha + ')');
+      grad.addColorStop(0.6, 'rgba(30,27,23,' + (p.alpha * 0.7) + ')');
+      grad.addColorStop(1, 'rgba(20,18,15,0)');
+    }
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function stepParticles(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(function(p){
+      p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.r += p.growth;
+      if(p.phase === 'in'){
+        p.alpha += 0.045;
+        if(p.alpha >= p.targetAlpha){ p.alpha = p.targetAlpha; p.phase = 'hold'; }
+      } else if(p.phase === 'out'){
+        p.alpha -= 0.02;
+      }
+      drawParticle(p);
+    });
+    particles = particles.filter(function(p){ return p.alpha > 0.01; });
+    if(particles.length > 0){
+      animId = requestAnimationFrame(stepParticles);
+    } else {
+      animId = null;
+    }
+  }
+
+  /* ---------- page routing ---------- */
+  var pageTitles = {
+    home: 'Noir & Aurum — Watches & Fragrance',
+    hours: 'The Hours — Watches | Noir & Aurum',
+    scent: 'The Scent — Fragrance | Noir & Aurum',
+    house: 'The House | Noir & Aurum',
+    acquire: 'Acquire | Noir & Aurum'
+  };
+  var validPages = Object.keys(pageTitles);
+  var currentPage = 'home';
+  var transitioning = false;
+
+  function switchSection(pageId){
+    document.querySelectorAll('.page').forEach(function(sec){
+      sec.classList.toggle('active', sec.dataset.page === pageId);
+    });
+    document.querySelectorAll('.nav-link').forEach(function(a){
+      a.classList.toggle('active', a.dataset.nav === pageId);
+    });
+    window.scrollTo(0, 0);
+    currentPage = pageId;
+    document.title = pageTitles[pageId] || document.title;
+    history.replaceState(null, '', '#' + pageId);
+    navPanel.classList.remove('open');
+    menuToggle.classList.remove('open');
+    menuToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  function goToPage(pageId, originEl){
+    if(transitioning || pageId === currentPage || validPages.indexOf(pageId) === -1) return;
+    transitioning = true;
+    ensureAudio();
+    playTransitionChime();
+
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var rect = originEl ? originEl.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight - 40, width: 0, height: 0 };
+    var ox = rect.left + rect.width / 2;
+    var oy = rect.top + rect.height / 2;
+
+    curtain.classList.add('active');
+    spawnParticles(ox, oy, reduce ? 5 : 24);
+    if(!animId){ animId = requestAnimationFrame(stepParticles); }
+
+    var swapDelay = reduce ? 130 : 520;
+    setTimeout(function(){
+      switchSection(pageId);
+      curtain.classList.remove('active');
+      particles.forEach(function(p){ p.phase = 'out'; });
+      var doneDelay = reduce ? 150 : 650;
+      setTimeout(function(){ transitioning = false; }, doneDelay);
+    }, swapDelay);
+  }
+
+  document.querySelectorAll('[data-nav]').forEach(function(el){
+    el.addEventListener('click', function(e){
+      e.preventDefault();
+      goToPage(el.getAttribute('data-nav'), el);
+    });
+    el.addEventListener('mouseenter', function(){ ensureAudio(); playHoverTick(); });
+  });
+
+  document.querySelectorAll('.product-grid').forEach(function(grid){
+    grid.addEventListener('mouseover', function(e){
+      var card = e.target.closest ? e.target.closest('.product-card') : null;
+      if(card){ ensureAudio(); playHoverTick(); }
+    });
+  });
+
+  document.querySelectorAll('.btn:not([data-nav]), .copy-btn').forEach(function(el){
+    el.addEventListener('click', function(){ ensureAudio(); playClickThud(); });
+  });
+
+  /* ---------- copy to clipboard ---------- */
+  document.querySelectorAll('[data-copy]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var value = btn.getAttribute('data-copy');
+      var original = btn.textContent;
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(value).then(function(){
+          btn.textContent = 'Copied';
+          setTimeout(function(){ btn.textContent = original; }, 1600);
+        }).catch(function(){});
+      }
+    });
+  });
+
+  /* ---------- mobile menu ---------- */
+  menuToggle.addEventListener('click', function(){
+    var open = navPanel.classList.toggle('open');
+    menuToggle.classList.toggle('open', open);
+    menuToggle.setAttribute('aria-expanded', String(open));
+  });
+
+  /* ---------- initial load ---------- */
+  var initial = (location.hash || '#home').slice(1);
+  if(validPages.indexOf(initial) === -1){ initial = 'home'; }
+  currentPage = initial;
+  document.querySelectorAll('.page').forEach(function(sec){
+    sec.classList.toggle('active', sec.dataset.page === currentPage);
+  });
+  document.querySelectorAll('.nav-link').forEach(function(a){
+    a.classList.toggle('active', a.dataset.nav === currentPage);
+  });
+  document.title = pageTitles[currentPage];
+})();
+</script>
+</body>
+</html>
