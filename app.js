@@ -69,6 +69,15 @@
       </article>`;
   }
 
+  function ornamentHTML(){
+    return `
+      <div class="ornament" aria-hidden="true">
+        <span class="line"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 2 14 8 20 9 15.5 13 17 19 12 15.5 7 19 8.5 13 4 9 10 8Z"/></svg>
+        <span class="line right"></span>
+      </div>`;
+  }
+
   function marqueeHTML(){
     const words = ["Hand-Finished", "Sealed in Wax", "By Appointment", "Cast in Antique Gold", "Bound by the Order"];
     const line = words.map(w => `<span>${w}</span>`).join("");
@@ -76,6 +85,10 @@
       <div class="marquee" aria-hidden="true">
         <div class="marquee-track">${line}${line}</div>
       </div>`;
+  }
+
+  function splitLetters(word, startIndex){
+    return word.split("").map((ch,i) => `<span class="letter" style="--i:${startIndex+i}">${ch}</span>`).join("");
   }
 
   /* ---------------------------------------------------------
@@ -91,18 +104,10 @@
               <path d="M200 12 L360 58 V220 C360 330 290 400 200 448 C110 400 40 330 40 220 V58 Z"/>
             </svg>
           </div>
-          <svg viewBox="0 0 400 400" class="bezel-svg" aria-hidden="true">
-            <circle class="bezel-outer" cx="200" cy="200" r="164"/>
-            <circle class="bezel-inner" cx="200" cy="200" r="130"/>
-            <g class="bezel-ticks"></g>
-            <g class="bottle-mark">
-              <path d="M186 90 h28 v22 h-6 v14 c18 6 30 24 30 46 v96 c0 12 -10 22 -22 22 h-32 c-12 0 -22 -10 -22 -22 v-96 c0 -22 12 -40 30 -46 v-14 h-6 z"/>
-              <rect x="188" y="86" width="24" height="10" rx="2" class="bottle-cap"/>
-            </g>
-          </svg>
+          <canvas id="hero-3d" aria-hidden="true"></canvas>
         </div>
         <p class="eyebrow">Bound by the Order &middot; Est. for those who keep their own hours</p>
-        <h1 class="hero-title">Noir <span class="amp">&amp;</span> Aurum</h1>
+        <h1 class="hero-title">${splitLetters("Noir",0)} <span class="amp letter" style="--i:4">&amp;</span> ${splitLetters("Aurum",5)}</h1>
         <p class="hero-sub">Timepieces struck in shadow. Fragrances distilled from gold. Objects made for those who move through the world quietly, and are recognised anyway.</p>
         <a href="#/timepieces" class="scroll-cue" data-route="/timepieces">
           <span>Enter the Atelier</span>
@@ -133,6 +138,8 @@
           ${window.NOIR_PRODUCTS.filter(p => p.collection === "fragrances").slice(0,3).map(cardHTML).join("")}
         </div>
       </section>
+
+      ${ornamentHTML()}
 
       <section class="collection">
         <div class="section-head reveal">
@@ -167,6 +174,8 @@
           </div>
         </div>
       </section>
+
+      ${ornamentHTML()}
 
       <section class="collection alt">
         <div class="section-head reveal">
@@ -382,6 +391,8 @@
         </div>
       </section>
 
+      ${ornamentHTML()}
+
       <section class="collection subsection">
         <div class="section-head reveal">
           <span class="hour-mark">VI</span>
@@ -515,7 +526,11 @@
     app.innerHTML = match.render();
     document.title = match.title;
     setActiveNav(path);
-    if(path === "/") drawBezelTicks();
+    if(path === "/" && window.NoirScene){
+      window.NoirScene.mountHero();
+    } else if(window.NoirScene){
+      window.NoirScene.unmountHero();
+    }
     initReveal();
   }
 
@@ -530,35 +545,49 @@
     if(reduceMotion){
       render(path);
       window.scrollTo(0,0);
-      if(window.__noirSmokeBurst) window.__noirSmokeBurst(x, y);
+      domBurst(x, y);
       return;
     }
+
+    const tiltY = (x / window.innerWidth - 0.5) * -26;
+    const tiltX = (y / window.innerHeight - 0.5) * 16;
+    const flipDur = ".6s cubic-bezier(.65,0,.35,1)";
 
     overlay.style.transition = "none";
     overlay.style.clipPath = `circle(0px at ${x}px ${y}px)`;
     overlay.classList.add("active");
+    app.style.transition = "none";
+    app.style.transform = "perspective(1400px) rotateX(0deg) rotateY(0deg) scale(1) translateZ(0px)";
     // force reflow before animating
     // eslint-disable-next-line no-unused-expressions
     overlay.offsetHeight;
-    overlay.style.transition = "clip-path .6s cubic-bezier(.65,0,.35,1)";
+    overlay.style.transition = `clip-path ${flipDur}`;
     overlay.style.clipPath = `circle(${radius}px at ${x}px ${y}px)`;
+    app.style.transition = `transform ${flipDur}`;
+    app.style.transform = `perspective(1400px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(.92) translateZ(-140px)`;
 
     const onCover = () => {
       overlay.removeEventListener("transitionend", onCover);
       window.scrollTo(0,0);
       render(path);
-      if(window.__noirSmokeBurst) window.__noirSmokeBurst(x, y);
+      domBurst(x, y);
 
       requestAnimationFrame(() => {
         overlay.style.transition = "none";
         overlay.style.clipPath = `circle(${radius}px at ${x}px ${y}px)`;
+        app.style.transition = "none";
+        app.style.transform = `perspective(1400px) rotateX(${-tiltX}deg) rotateY(${-tiltY}deg) scale(.92) translateZ(-140px)`;
         overlay.offsetHeight;
-        overlay.style.transition = "clip-path .6s cubic-bezier(.65,0,.35,1)";
+        overlay.style.transition = `clip-path ${flipDur}`;
         overlay.style.clipPath = `circle(0px at ${x}px ${y}px)`;
+        app.style.transition = `transform ${flipDur}`;
+        app.style.transform = "perspective(1400px) rotateX(0deg) rotateY(0deg) scale(1) translateZ(0px)";
 
         const onReveal = () => {
           overlay.removeEventListener("transitionend", onReveal);
           overlay.classList.remove("active");
+          app.style.transition = "none";
+          app.style.transform = "";
         };
         overlay.addEventListener("transitionend", onReveal, { once: true });
       });
@@ -592,7 +621,7 @@
       e.preventDefault();
       if(window.NoirAudio) window.NoirAudio.click();
       goTo(routeEl.dataset.route, { x: e.clientX, y: e.clientY });
-      if(window.__noirSmokeBurst) window.__noirSmokeBurst(e.clientX, e.clientY);
+      domBurst(e.clientX, e.clientY);
       return;
     }
 
@@ -732,6 +761,50 @@
     });
   }
 
+  /* ---------------------------------------------------------
+     Hero parallax on scroll — mark drifts slower than the page,
+     text drifts slightly faster, for a sense of depth.
+  --------------------------------------------------------- */
+  if(!reduceMotion){
+    document.addEventListener("scroll", () => {
+      const hero = document.querySelector(".hero");
+      if(!hero) return;
+      const y = window.scrollY;
+      if(y > window.innerHeight * 1.2) return; // hero long out of view, skip work
+      const mark = document.getElementById("hero-mark");
+      const title = hero.querySelector(".hero-title");
+      const sub = hero.querySelector(".hero-sub");
+      if(mark) mark.style.transform = `translateY(${y * 0.18}px) scale(${Math.max(1 - y*0.0003, 0.85)})`;
+      if(title) title.style.transform = `translateY(${y * 0.08}px)`;
+      if(sub) sub.style.transform = `translateY(${y * 0.05}px)`;
+    }, { passive: true });
+  }
+
+  /* ---------------------------------------------------------
+     Magnetic buttons — nudge toward the cursor within range
+  --------------------------------------------------------- */
+  if(isFinePointer && !reduceMotion){
+    const MAGNET_RANGE = 70;
+    const MAGNET_STRENGTH = 0.28;
+    document.addEventListener("mousemove", (e) => {
+      document.querySelectorAll(".btn-primary, .btn-ghost, .scroll-cue").forEach(btn => {
+        const rect = btn.getBoundingClientRect();
+        const cx = rect.left + rect.width/2;
+        const cy = rect.top + rect.height/2;
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+        const dist = Math.hypot(dx, dy);
+        if(dist < MAGNET_RANGE + rect.width/2){
+          btn.style.setProperty("--mgx", (dx * MAGNET_STRENGTH) + "px");
+          btn.style.setProperty("--mgy", (dy * MAGNET_STRENGTH) + "px");
+        } else {
+          btn.style.setProperty("--mgx", "0px");
+          btn.style.setProperty("--mgy", "0px");
+        }
+      });
+    });
+  }
+
   document.addEventListener("submit", (e) => {
     if(e.target.id !== "checkout-form") return;
     e.preventDefault();
@@ -800,25 +873,29 @@
   setSound(localStorage.getItem(SOUND_KEY) === "1");
 
   /* ---------------------------------------------------------
-     Bezel hour-ticks (home hero only)
+     3D scene: ambient background + hero emblem lifecycle
   --------------------------------------------------------- */
-  function drawBezelTicks(){
-    const g = document.querySelector(".bezel-ticks");
-    if(!g) return;
-    const cx = 200, cy = 200, rOuter = 164, rInner = 150;
-    for(let i=0;i<12;i++){
-      const angle = (i / 12) * Math.PI * 2 - Math.PI/2;
-      const x1 = cx + Math.cos(angle) * rOuter;
-      const y1 = cy + Math.sin(angle) * rOuter;
-      const x2 = cx + Math.cos(angle) * rInner;
-      const y2 = cy + Math.sin(angle) * rInner;
-      const line = document.createElementNS("http://www.w3.org/2000/svg","line");
-      line.setAttribute("x1", x1.toFixed(2));
-      line.setAttribute("y1", y1.toFixed(2));
-      line.setAttribute("x2", x2.toFixed(2));
-      line.setAttribute("y2", y2.toFixed(2));
-      line.style.animationDelay = (0.9 + i*0.05) + "s";
-      g.appendChild(line);
+  if(window.NoirScene) window.NoirScene.initBackground();
+
+  /* ---------------------------------------------------------
+     DOM ember burst — lightweight click/transition feedback
+     (the ambient depth-field itself now lives in scene.js/WebGL)
+  --------------------------------------------------------- */
+  function domBurst(x, y){
+    const count = 7;
+    for(let i = 0; i < count; i++){
+      const el = document.createElement("div");
+      el.className = "ember-burst";
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 34 + Math.random() * 64;
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      el.style.setProperty("--dx", (Math.cos(angle) * dist).toFixed(1) + "px");
+      el.style.setProperty("--dy", (Math.sin(angle) * dist).toFixed(1) + "px");
+      el.style.setProperty("--delay", (Math.random() * 0.08).toFixed(2) + "s");
+      el.style.color = Math.random() > 0.5 ? "var(--gold-bright)" : "var(--burgundy-bright)";
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 850);
     }
   }
 
@@ -856,75 +933,6 @@
     if(chronoFill) chronoFill.style.strokeDashoffset = (CIRC * (1 - pct)).toFixed(1);
   }
   document.addEventListener("scroll", updateChrono, { passive: true });
-
-  /* ---------------------------------------------------------
-     Ambient smoke particle canvas
-  --------------------------------------------------------- */
-  const canvas = document.getElementById("smoke-canvas");
-  if(canvas && !reduceMotion){
-    const ctx = canvas.getContext("2d");
-    let w, h, dpr;
-    function resize(){
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      w = canvas.width = window.innerWidth * dpr;
-      h = canvas.height = window.innerHeight * dpr;
-      canvas.style.width = window.innerWidth + "px";
-      canvas.style.height = window.innerHeight + "px";
-    }
-    resize();
-    window.addEventListener("resize", resize);
-
-    const particles = [];
-    const MAX_PARTICLES = 30;
-    const goldTones = ["201,162,75", "240,212,136", "138,115,69", "138,31,46"];
-
-    function spawn(x, y, burst){
-      particles.push({
-        x: x ?? Math.random() * w,
-        y: y ?? h + 40 * dpr,
-        r: (burst ? 12 : 24) + Math.random() * (burst ? 26 : 46),
-        vy: -(0.18 + Math.random() * 0.35) * dpr * (burst ? 1.8 : 1),
-        vx: (Math.random() - 0.5) * (burst ? 1.2 : 0.25) * dpr,
-        life: 0,
-        maxLife: burst ? 70 : 600 + Math.random() * 400,
-        alpha: burst ? 0.4 : 0.10 + Math.random() * 0.08,
-        tone: goldTones[Math.floor(Math.random()*goldTones.length)],
-        drift: Math.random() * Math.PI * 2,
-      });
-    }
-    for(let i=0;i<MAX_PARTICLES;i++) spawn(Math.random()*w, Math.random()*h);
-
-    function tick(){
-      ctx.clearRect(0,0,w,h);
-      for(let i = particles.length - 1; i >= 0; i--){
-        const p = particles[i];
-        p.life++;
-        p.y += p.vy;
-        p.drift += 0.01;
-        p.x += p.vx + Math.sin(p.drift) * 0.3 * dpr;
-        const lifeRatio = p.life / p.maxLife;
-        const fade = lifeRatio < 0.15 ? lifeRatio/0.15 : lifeRatio > 0.7 ? Math.max(0, 1 - (lifeRatio-0.7)/0.3) : 1;
-        const a = p.alpha * fade;
-        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
-        grad.addColorStop(0, `rgba(${p.tone},${a})`);
-        grad.addColorStop(1, `rgba(${p.tone},0)`);
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-        ctx.fill();
-        if(p.life > p.maxLife || p.y < -60*dpr){
-          particles.splice(i,1);
-          if(particles.length < MAX_PARTICLES) spawn();
-        }
-      }
-      requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-
-    window.__noirSmokeBurst = function(clientX, clientY){
-      for(let i=0;i<8;i++) spawn(clientX*dpr, clientY*dpr, true);
-    };
-  }
 
   /* ---------------------------------------------------------
      Initial render
