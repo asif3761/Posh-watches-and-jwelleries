@@ -19,11 +19,11 @@ window.NoirAudio = (() => {
     master.gain.value = 0.7;
     master.connect(ctx.destination);
 
-    // dry / wet split for a subtle room reverb
-    dry = ctx.createGain(); dry.gain.value = 0.75;
-    wet = ctx.createGain(); wet.gain.value = 0.35;
+    // dry / wet split — tight, cold reverb (steel corridor, not cathedral)
+    dry = ctx.createGain(); dry.gain.value = 0.8;
+    wet = ctx.createGain(); wet.gain.value = 0.22;
     convolver = ctx.createConvolver();
-    convolver.buffer = buildImpulse(2.2, 2.4);
+    convolver.buffer = buildImpulse(0.9, 3.4);
 
     dry.connect(master);
     wet.connect(convolver);
@@ -102,47 +102,71 @@ window.NoirAudio = (() => {
 
   function ensure(){ init(); if(ctx.state === "suspended") ctx.resume(); }
 
+  // Metallic strike: several close, deliberately inharmonic partials
+  // through a resonant highpass — the timbre of steel, not a bell.
+  function metalHit(baseFreq, { start=0, dur=0.5, gain=0.05, ratios=[1, 2.41, 3.87] } = {}){
+    ratios.forEach((r, i) => {
+      voice(baseFreq * r, {
+        type: i === 0 ? "triangle" : "sine",
+        dur: dur * (1 - i*0.15),
+        gain: gain * (1 - i*0.3),
+        start,
+        filterFreq: baseFreq * 6,
+      });
+    });
+  }
+
+  // Very short filtered noise transient — the "tick" of metal on metal,
+  // layered under metalHit for a more percussive, less synthy attack.
+  function noiseTick({ start=0, gain=0.03, freq=3200 } = {}){
+    noiseSwell({ start, dur:0.06, peakGain:gain, filterFrom:freq*0.7, filterTo:freq*1.4 });
+  }
+
   return {
     setEnabled(v){ enabled = v; if(v) ensure(); },
     isEnabled(){ return enabled; },
 
     hover(){
       if(!enabled) return; ensure();
-      voice(1046.5, { type:"sine", dur:0.35, gain:0.018, filterFreq:3000 });
+      voice(2600, { type:"triangle", dur:0.12, gain:0.012, filterFreq:4200 });
     },
 
     click(){
       if(!enabled) return; ensure();
-      voice(523.25, { type:"triangle", dur:0.7, gain:0.045, filterFreq:2200 });
-      voice(783.99, { type:"sine", dur:0.9, gain:0.03, start:0.02 });
+      noiseTick({ gain:0.035, freq:3800 });
+      metalHit(880, { dur:0.4, gain:0.05 });
     },
 
     addToCart(){
       if(!enabled) return; ensure();
-      // short ascending arpeggio, like a case latch closing
-      [392.0, 493.88, 587.33, 783.99].forEach((f, i) => {
-        voice(f, { type:"triangle", dur:0.6, gain:0.035, start:i*0.045, filterFreq:2600 });
-      });
+      // a firm steel stamp: low thud, then a bright metallic ring
+      voice(140, { type:"sine", dur:0.3, gain:0.08, filterFreq:400 });
+      noiseTick({ start:0.02, gain:0.04, freq:4200 });
+      metalHit(920, { start:0.03, dur:0.7, gain:0.045 });
     },
 
     remove(){
       if(!enabled) return; ensure();
-      voice(349.23, { type:"sine", dur:0.4, gain:0.03 });
-      voice(261.63, { type:"sine", dur:0.5, gain:0.02, start:0.05 });
+      metalHit(560, { dur:0.35, gain:0.04 });
+      voice(120, { type:"sine", dur:0.3, gain:0.03, start:0.03 });
     },
 
     pageTransition(){
       if(!enabled) return; ensure();
-      noiseSwell({ dur:0.75, peakGain:0.05, filterFrom:180, filterTo:2400 });
-      voice(196.0, { type:"sine", dur:1.1, gain:0.02, filterFreq:900 });
+      // a synchronization pulse: filtered static sweep + two crisp
+      // ascending metallic blips, not a warm swelling tone.
+      noiseSwell({ dur:0.4, peakGain:0.05, filterFrom:1200, filterTo:5200 });
+      metalHit(660, { start:0.05, dur:0.22, gain:0.03, ratios:[1, 2.0] });
+      metalHit(990, { start:0.14, dur:0.28, gain:0.032, ratios:[1, 2.0] });
     },
 
     checkoutSuccess(){
       if(!enabled) return; ensure();
-      [261.63, 329.63, 392.0, 523.25].forEach((f, i) => {
-        voice(f, { type:"sine", dur:1.3, gain:0.04, start:i*0.09, filterFreq:3200 });
+      // synchronized: resolved ascending metallic sequence
+      [440, 587.33, 880].forEach((f, i) => {
+        metalHit(f, { start:i*0.1, dur:0.9, gain:0.045, ratios:[1, 2.0, 3.0] });
       });
-      noiseSwell({ start:0.05, dur:1.0, peakGain:0.02, filterFrom:400, filterTo:1200 });
+      noiseTick({ start:0.28, gain:0.03, freq:5000 });
     },
   };
 })();

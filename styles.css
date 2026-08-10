@@ -1,29 +1,33 @@
 /* ============================================================
    NOIR & AURUM — design tokens
-   "An Empire of Knights" — obsidian navy, old wine, antique gold
-   Void #0A0B10 / Char #12141C / Steel #3D4250 / Burgundy #5C1420
-   Gold #C9A24B / Gold-bright #F0D488 / Bone (parchment) #ECE4D2
-   Display: Fraunces · Body: Manrope · Utility: Space Mono
+   "Order of Steel" — graphite void, brushed silver, cold blade-blue
+   Void #0B0C0E / Char #15171A / Steel #9AA4B0 / Steel-bright #E6EBF0
+   Blade #3A5F6E / Blade-bright #5B8FA3 / Bone (parchment) #E4E7EA
+   Display: Cinzel · Body: Manrope · Utility: Space Mono
    ============================================================ */
 
 :root{
-  --void: #0a0b10;
-  --char: #12141c;
-  --char-2: #171a24;
-  --smoke: #3d4250;
-  --hairline: #23262f;
-  --gold: #c9a24b;
-  --gold-bright: #f0d488;
-  --gold-dim: #8a7345;
-  --bone: #ece4d2;
-  --bone-dim: #9c9a8f;
+  --void: #0b0c0e;
+  --char: #15171a;
+  --char-2: #1a1d21;
+  --smoke: #4a5158;
+  --hairline: #2a2e33;
 
-  --burgundy: #5c1420;
-  --burgundy-bright: #8a1f2e;
-  --burgundy-dim: #3a0d16;
-  --steel: #3d4250;
+  /* primary metallic accent (was gold) */
+  --gold: #9aa4b0;
+  --gold-bright: #e6ebf0;
+  --gold-dim: #5a626c;
 
-  --display: 'Fraunces', serif;
+  --bone: #e4e7ea;
+  --bone-dim: #8d949c;
+
+  /* secondary cold accent (was burgundy) */
+  --burgundy: #23414c;
+  --burgundy-bright: #5b8fa3;
+  --burgundy-dim: #16262c;
+  --steel: #4a5158;
+
+  --display: 'Cinzel', serif;
   --body: 'Manrope', sans-serif;
   --mono: 'Space Mono', monospace;
 
@@ -60,9 +64,9 @@ body::before{
   pointer-events:none;
   z-index:2;
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(201,162,75,0.06), transparent 55%),
-    radial-gradient(ellipse at 15% 40%, rgba(92,20,32,0.10), transparent 50%),
-    radial-gradient(ellipse at 85% 65%, rgba(92,20,32,0.08), transparent 55%),
+    radial-gradient(ellipse at 50% 0%, rgba(154,164,176,0.06), transparent 55%),
+    radial-gradient(ellipse at 15% 40%, rgba(35,65,76,0.10), transparent 50%),
+    radial-gradient(ellipse at 85% 65%, rgba(35,65,76,0.08), transparent 55%),
     radial-gradient(ellipse at 50% 100%, rgba(0,0,0,0.55), transparent 60%);
 }
 
@@ -71,7 +75,7 @@ body::before{
   position:absolute;
   inset:0;
   pointer-events:none;
-  background:radial-gradient(circle 420px at var(--mx,50%) var(--my,30%), rgba(201,162,75,.10), transparent 65%);
+  background:radial-gradient(circle 420px at var(--mx,50%) var(--my,30%), rgba(154,164,176,.10), transparent 65%);
   transition:background .15s linear;
   z-index:0;
 }
@@ -128,9 +132,9 @@ body::before{
 }
 .wordmark{
   font-family:var(--display);
-  font-style:italic;
-  font-size:1.3rem;
-  letter-spacing:.04em;
+  font-weight:600;
+  font-size:1.2rem;
+  letter-spacing:.12em;
   color:var(--gold-bright);
 }
 .main-nav{
@@ -255,7 +259,6 @@ body::before{
 }
 @keyframes letterHinge{ to{ opacity:1; transform:rotateX(0) translateY(0); } }
 .hero-title .amp{
-  font-style:italic;
   color:var(--gold);
   padding:0 .08em;
 }
@@ -293,7 +296,7 @@ body::before{
   margin:0 auto;
   padding:120px 24px;
 }
-.collection.alt{ background:linear-gradient(180deg, transparent, rgba(201,162,75,.03), transparent); }
+.collection.alt{ background:linear-gradient(180deg, transparent, rgba(154,164,176,.03), transparent); }
 
 .section-head{
   max-width:640px;
@@ -355,7 +358,7 @@ body::before{
 .p-card.in-view{ opacity:1; transform:translateY(0); transition:border-color .35s var(--ease), box-shadow .35s var(--ease), transform .15s ease-out; }
 .p-card:hover{
   border-color:var(--gold-dim);
-  box-shadow:0 0 0 1px rgba(199,163,86,.15), 0 18px 40px -20px rgba(199,163,86,.35);
+  box-shadow:0 0 0 1px rgba(154,164,176,.15), 0 18px 40px -20px rgba(154,164,176,.35);
 }
 .p-card .icon{
   width:56px; height:56px;
@@ -727,8 +730,8 @@ body::before{
   position:fixed; inset:0;
   z-index:100;
   background:
-    radial-gradient(circle at var(--ox,50%) var(--oy,50%), rgba(201,162,75,.16), transparent 40%),
-    radial-gradient(circle at var(--ox,50%) var(--oy,50%), rgba(92,20,32,.35), transparent 65%),
+    radial-gradient(circle at var(--ox,50%) var(--oy,50%), rgba(154,164,176,.16), transparent 40%),
+    radial-gradient(circle at var(--ox,50%) var(--oy,50%), rgba(91,143,163,.28), transparent 65%),
     var(--void);
   clip-path:circle(0px at 50% 50%);
   pointer-events:none;
@@ -825,7 +828,7 @@ body::before{
 }
 .pillar-inner:hover{
   border-color:var(--gold);
-  box-shadow:0 24px 50px -28px rgba(201,162,75,.4);
+  box-shadow:0 24px 50px -28px rgba(154,164,176,.4);
 }
 .pillar-icon{
   width:44px; height:44px; margin:0 auto 20px;
@@ -1005,8 +1008,9 @@ body::before{
   display:flex; align-items:center; justify-content:center;
   color:var(--gold-bright);
   font-family:var(--display);
-  font-style:italic;
-  font-size:1rem;
+  font-weight:600;
+  font-size:.85rem;
+  letter-spacing:.04em;
   pointer-events:none;
   transform:translate(-50%,-50%) scale(0) rotate(-25deg);
   opacity:0;
@@ -1148,4 +1152,39 @@ body{
     transform:none !important;
   }
   .ember-burst{ display:none; }
+}
+
+/* ============================================================
+   NOIR & AURUM — v6: "Order of Steel" — sync scan-line for
+   page transitions, brushed-metal card edges
+   ============================================================ */
+
+#scan-line{
+  position:fixed;
+  left:0; right:0;
+  height:2px;
+  top:-10px;
+  opacity:0;
+  z-index:101;
+  pointer-events:none;
+  background:linear-gradient(90deg, transparent, var(--gold-bright), var(--burgundy-bright), transparent);
+  box-shadow:0 0 24px 3px rgba(230,235,240,.5);
+}
+#scan-line.sweep{
+  animation:scanSweep .62s linear;
+}
+@keyframes scanSweep{
+  0%{ top:-2%; opacity:0; }
+  8%{ opacity:1; }
+  92%{ opacity:1; }
+  100%{ top:102%; opacity:0; }
+}
+
+/* brushed-steel edge highlight on cards, replacing the soft gold glow */
+.p-card:hover, .pillar-inner:hover{
+  border-image:linear-gradient(135deg, var(--gold-bright), var(--hairline) 40%, var(--gold-dim)) 1;
+}
+
+@media (prefers-reduced-motion: reduce){
+  #scan-line{ display:none; }
 }

@@ -33,8 +33,8 @@ window.NoirScene = (() => {
     const count = 650;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
-    const gold = new THREE.Color(0xc9a24b);
-    const burgundy = new THREE.Color(0x8a1f2e);
+    const gold = new THREE.Color(0x9aa4b0);
+    const burgundy = new THREE.Color(0x5b8fa3);
     for(let i = 0; i < count; i++){
       positions[i*3]   = (Math.random() - 0.5) * 1700;
       positions[i*3+1] = (Math.random() - 0.5) * 1700;
@@ -102,11 +102,11 @@ window.NoirScene = (() => {
     heroCamera = new THREE.PerspectiveCamera(38, w / h, 0.1, 100);
     heroCamera.position.set(0, 0, 7.2);
 
-    heroScene.add(new THREE.AmbientLight(0x2a2820, 1.3));
-    const goldLight = new THREE.PointLight(0xf0d488, 2.4, 22);
+    heroScene.add(new THREE.AmbientLight(0x1c1f22, 1.3));
+    const goldLight = new THREE.PointLight(0xe6ebf0, 2.4, 22);
     goldLight.position.set(4, 4, 5);
     heroScene.add(goldLight);
-    const burgLight = new THREE.PointLight(0x8a1f2e, 2.0, 22);
+    const burgLight = new THREE.PointLight(0x5b8fa3, 2.0, 22);
     burgLight.position.set(-4, -3, 4);
     heroScene.add(burgLight);
     const rim = new THREE.PointLight(0xffffff, 0.6, 20);
@@ -117,20 +117,20 @@ window.NoirScene = (() => {
 
     const ring = new THREE.Mesh(
       new THREE.TorusGeometry(2.15, 0.15, 28, 100),
-      new THREE.MeshStandardMaterial({ color: 0xc9a24b, metalness: 0.92, roughness: 0.24, emissive: 0x2a1d08, emissiveIntensity: 0.35 })
+      new THREE.MeshStandardMaterial({ color: 0x9aa4b0, metalness: 0.92, roughness: 0.24, emissive: 0x1a2226, emissiveIntensity: 0.35 })
     );
     heroGroup.add(ring);
 
     heroRing2 = new THREE.Mesh(
       new THREE.TorusGeometry(1.55, 0.028, 16, 100),
-      new THREE.MeshStandardMaterial({ color: 0x8a1f2e, metalness: 0.55, roughness: 0.4 })
+      new THREE.MeshStandardMaterial({ color: 0x5b8fa3, metalness: 0.55, roughness: 0.4 })
     );
     heroRing2.rotation.x = Math.PI / 2.35;
     heroGroup.add(heroRing2);
 
     heroGem = new THREE.Mesh(
       new THREE.IcosahedronGeometry(0.82, 0),
-      new THREE.MeshStandardMaterial({ color: 0x8a1f2e, metalness: 0.25, roughness: 0.12, emissive: 0x3a0d16, emissiveIntensity: 0.55, flatShading: true })
+      new THREE.MeshStandardMaterial({ color: 0x5b8fa3, metalness: 0.25, roughness: 0.12, emissive: 0x16262c, emissiveIntensity: 0.55, flatShading: true })
     );
     heroGroup.add(heroGem);
 
@@ -139,7 +139,7 @@ window.NoirScene = (() => {
       const angle = (i / 12) * Math.PI * 2;
       const tick = new THREE.Mesh(
         new THREE.BoxGeometry(0.04, 0.22, 0.04),
-        new THREE.MeshStandardMaterial({ color: 0xf0d488, metalness: 0.8, roughness: 0.3 })
+        new THREE.MeshStandardMaterial({ color: 0xe6ebf0, metalness: 0.8, roughness: 0.3 })
       );
       tick.position.set(Math.cos(angle) * 1.9, Math.sin(angle) * 1.9, 0);
       tick.lookAt(0,0,0);

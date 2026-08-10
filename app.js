@@ -9,6 +9,7 @@
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const app = document.getElementById("app");
   const overlay = document.getElementById("page-transition");
+  const scanLine = document.getElementById("scan-line");
   const toastRoot = document.getElementById("toast-root");
   const yearEl = document.getElementById("year");
   if(yearEl) yearEl.textContent = new Date().getFullYear();
@@ -79,7 +80,7 @@
   }
 
   function marqueeHTML(){
-    const words = ["Hand-Finished", "Sealed in Wax", "By Appointment", "Cast in Antique Gold", "Bound by the Order"];
+    const words = ["Hand-Finished", "Forged in Silver", "By Appointment", "Tempered in Steel", "Bound by the Order"];
     const line = words.map(w => `<span>${w}</span>`).join("");
     return `
       <div class="marquee" aria-hidden="true">
@@ -541,6 +542,13 @@
     overlay.style.setProperty("--oy", y + "px");
 
     if(window.NoirAudio) window.NoirAudio.pageTransition();
+
+    if(scanLine){
+      scanLine.classList.remove("sweep");
+      // eslint-disable-next-line no-unused-expressions
+      scanLine.offsetHeight;
+      scanLine.classList.add("sweep");
+    }
 
     if(reduceMotion){
       render(path);
